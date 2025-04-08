@@ -14,12 +14,10 @@ class Agent(BaseModel):
     score: float = Field(default=0.0, description="Cumulative score for the agent.")
 
     def update_argument(self, new_argument: str) -> None:
-        """Update the current argument and record it in the history."""
         self.current_argument = new_argument
         self.argument_history.append(new_argument)
 
     def update_score(self, points: float) -> None:
-        """Add points to the agent's score."""
         self.score += points
 
 
@@ -31,7 +29,7 @@ class Debater(Agent):
 
 class Moderator(Agent):
     rule_set: str = Field(
-        default="Default Debate Rules",
+        default="Default Debate Rules: Be concise, use logic and evidence, and limit each argument to no more than six sentences.",
         description="Debate rules defined by the moderator.",
     )
     rounds: int = Field(
