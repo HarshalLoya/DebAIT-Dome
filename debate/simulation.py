@@ -6,11 +6,6 @@ from debate.evaluation import score_argument
 
 
 def stream_message(message: str, delay: float = 0.5):
-    """
-    Simulate streaming of a message by splitting it into sentence segments.
-    Yields each segment with a slight delay.
-    """
-    # Split the message into sentences (naively by '.')
     sentences = [s.strip() for s in message.split(".") if s.strip()]
     segments = [s + "." for s in sentences]
     for segment in segments:
@@ -21,16 +16,6 @@ def stream_message(message: str, delay: float = 0.5):
 def stream_multi_round_debate(
     debate_topic: str, num_rounds: int = 3, tone: str = "Formal", max_sentences: int = 6
 ):
-    """
-    Generator function that simulates a multi-round debate and yields streaming
-    message segments. Each yielded item is a dict containing:
-      • round number
-      • debater (name)
-      • text segment
-      • timestamp
-      • cumulative score for that debater
-    """
-    # Create agents
     debater_a = Debater(name="Debater A", role="Debater", debate_side="Pro")
     debater_b = Debater(name="Debater B", role="Debater", debate_side="Con")
     moderator = Moderator(name="Moderator", role="Moderator")

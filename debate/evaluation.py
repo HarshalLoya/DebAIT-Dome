@@ -6,16 +6,6 @@ from nltk.corpus import stopwords
 
 
 def score_argument(argument: str, debate_topic: str) -> float:
-    """
-    Scores the given argument on several criteria:
-
-    - Relevance: proportion of debate topic words that appear in the argument.
-    - Coherence: based on sentence count (arguments should be brief and logical).
-    - Factuality: counts the presence of key factual indicators.
-    - Persuasiveness: counts persuasive phrases.
-
-    Returns an overall score (0-10) rounded to two decimals.
-    """
     stop_words = set(stopwords.words("english"))
 
     # 1. Relevance: Count how many words from the debate topic appear in the argument.
@@ -31,13 +21,11 @@ def score_argument(argument: str, debate_topic: str) -> float:
         ) / len(argument_words)
     else:
         relevance_ratio = 0
-    # Map ratio to a 0-10 scale.
     relevance_score = min(relevance_ratio * 10, 10)
 
     # 2. Coherence: A concise argument will have no more than 6 sentences.
     sentences = re.split(r"(?<=[.!?])\s+", argument.strip())
     num_sentences = len(sentences)
-    # If within acceptable range, assign high coherence; otherwise, penalize.
     if num_sentences <= 6:
         coherence_score = 10
     else:
