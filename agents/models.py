@@ -29,7 +29,7 @@ class Debater(Agent):
 
 class Moderator(Agent):
     rule_set: str = Field(
-        default="Default Debate Rules: Be concise, use logic and evidence, and limit each argument to no more than six sentences.",
+        default="Default Debate Rules: Be concise, logical, and support your claims with evidence. Limit each argument to no more than six sentences.",
         description="Debate rules defined by the moderator.",
     )
     rounds: int = Field(

@@ -2,20 +2,18 @@ import sys
 import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 import streamlit as st
 from debate.simulation import simulate_multi_round_debate
 
 st.set_page_config(page_title="Multi-Agent AI Debate System", layout="wide")
 st.title("Multi-Agent AI Debate System")
 st.write(
-    "Enter a debate topic below and choose the number of rounds to watch the debate unfold between two AI agents!"
+    "Enter a debate topic below, choose the number of rounds, and watch the debate unfold with scoring and evaluation!"
 )
 
-# Text input for the debate topic.
+# Input for the debate topic.
 debate_topic = st.text_input(
-    "Debate Topic",
-    value="Would teleportation be ethical if it destroys the original you and creates a clone?",
+    "Debate Topic", value="Artificial intelligence should be regulated."
 )
 
 # Slider to choose the number of rounds.
@@ -35,12 +33,16 @@ if st.button("Start Debate"):
         st.write("### Debater A (Pro)'s Arguments:")
         for idx, arg in enumerate(debate_states["debater_a"].argument_history, start=1):
             st.markdown(f"**Round {idx}:** {arg}")
+        st.markdown(
+            f"**Final Score for Debater A:** {debate_states['debater_a'].score}"
+        )
 
         st.write("### Debater B (Con)'s Arguments:")
         for idx, arg in enumerate(debate_states["debater_b"].argument_history, start=1):
             st.markdown(f"**Round {idx}:** {arg}")
+        st.markdown(
+            f"**Final Score for Debater B:** {debate_states['debater_b'].score}"
+        )
 
-        st.subheader("Final Agent States")
-        st.json(debate_states["debater_a"].model_dump())
-        st.json(debate_states["debater_b"].model_dump())
+        st.subheader("Moderator State")
         st.json(debate_states["moderator"].model_dump())

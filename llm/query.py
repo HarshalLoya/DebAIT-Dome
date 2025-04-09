@@ -9,7 +9,7 @@ def query_llm(prompt: str) -> str:
             "API key not found. Please set the 'GROQ_LLAMA_70B_VERSATILE_API_KEY' environment variable."
         )
 
-    api_url = "https://api.groq.com/openai/v1/chat/completions"    # Groq API endpoint
+    api_url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     payload = {
         "model": "llama-3.3-70b-versatile",
