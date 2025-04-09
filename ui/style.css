@@ -1,0 +1,49 @@
+/* Title styling */
+h1 {
+  background: linear-gradient(45deg, #3a7bd5, #00d2ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+
+/* Message styles */
+.pro {
+  color: #1565c0;
+  background-color: #e3f2fd;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.con {
+  color: #6a1b9a;
+  background-color: #f3e5f5;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+/* Round header */
+.round-header {
+  text-align: center;
+  font-weight: bold;
+  margin: 20px 0 10px 0;
+}
+
+/* Badge styling */
+.badge {
+  font-size: 0.8em;
+  padding: 3px 8px;
+  border-radius: 10px;
+  color: white;
+  margin-left: 5px;
+}
+
+.pro-badge {
+  background-color: #1565c0;
+}
+
+.con-badge {
+  background-color: #6a1b9a;
+}

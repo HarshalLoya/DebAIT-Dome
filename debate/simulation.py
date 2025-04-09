@@ -1,93 +1,131 @@
+import time
+from datetime import datetime
 from agents.models import Debater, Moderator
 from llm.query import query_llm
 from debate.evaluation import score_argument
 
 
-def simulate_multi_round_debate(debate_topic: str, num_rounds: int = 3):
+def stream_message(message: str, delay: float = 0.5):
     """
-    Simulate a multi-round debate between Pro and Con debaters.
-
-    - Round 1: Opening arguments.
-    - Rounds 2 to num_rounds: Rebuttals, where each debater addresses their opponent's latest argument.
-
-    Each argument is limited to no more than six sentences and must adhere to the debate rules.
-    After each argument, the system evaluates its score and adds it to the debater's cumulative score.
+    Simulate streaming of a message by splitting it into sentence segments.
+    Yields each segment with a slight delay.
     """
-    # Create agents.
+    # Split the message into sentences (naively by '.')
+    sentences = [s.strip() for s in message.split(".") if s.strip()]
+    segments = [s + "." for s in sentences]
+    for segment in segments:
+        yield segment
+        time.sleep(delay)
+
+
+def stream_multi_round_debate(
+    debate_topic: str, num_rounds: int = 3, tone: str = "Formal", max_sentences: int = 6
+):
+    """
+    Generator function that simulates a multi-round debate and yields streaming
+    message segments. Each yielded item is a dict containing:
+      • round number
+      • debater (name)
+      • text segment
+      • timestamp
+      • cumulative score for that debater
+    """
+    # Create agents
     debater_a = Debater(name="Debater A", role="Debater", debate_side="Pro")
     debater_b = Debater(name="Debater B", role="Debater", debate_side="Con")
     moderator = Moderator(name="Moderator", role="Moderator")
-
     moderator.start_debate()
 
-    # Round 1: Opening arguments.
+    # Round 1: Opening arguments for both sides
     prompt_a = (
         f"Debate Topic: {debate_topic}\n"
         f"Debate Rules: {moderator.rule_set}\n"
         "When making your argument, please limit your response to no more than 6 sentences.\n"
+        "Tone: " + tone + "\n"
         "Role: Pro Debater\n"
         "Generate a well-reasoned opening argument in favor of the topic."
     )
-    argument_a = query_llm(prompt_a)
-    debater_a.update_argument(argument_a)
-    score_a = score_argument(argument_a, debate_topic)
+    message_a = query_llm(prompt_a)
+    score_a = score_argument(message_a, debate_topic)
+    debater_a.update_argument(message_a)
     debater_a.update_score(score_a)
+    # Stream Debater A's message segments
+    for segment in stream_message(message_a):
+        yield {
+            "round": 1,
+            "debater": "Debater A",
+            "text": segment,
+            "timestamp": datetime.now().strftime("%H:%M:%S"),
+            "score": debater_a.score,
+        }
 
     prompt_b = (
         f"Debate Topic: {debate_topic}\n"
         f"Debate Rules: {moderator.rule_set}\n"
         "When making your argument, please limit your response to no more than 6 sentences.\n"
+        "Tone: " + tone + "\n"
         "Role: Con Debater\n"
         "Generate a well-reasoned opening argument against the topic."
     )
-    argument_b = query_llm(prompt_b)
-    debater_b.update_argument(argument_b)
-    score_b = score_argument(argument_b, debate_topic)
+    message_b = query_llm(prompt_b)
+    score_b = score_argument(message_b, debate_topic)
+    debater_b.update_argument(message_b)
     debater_b.update_score(score_b)
+    # Stream Debater B's message segments
+    for segment in stream_message(message_b):
+        yield {
+            "round": 1,
+            "debater": "Debater B",
+            "text": segment,
+            "timestamp": datetime.now().strftime("%H:%M:%S"),
+            "score": debater_b.score,
+        }
 
-    # Rounds 2 ... num_rounds: Rebuttals.
+    # Rounds 2 ... num_rounds: Rebuttals
     for round_num in range(2, num_rounds + 1):
         moderator.next_round()
-
-        # Pro's rebuttal addressing Con's latest argument.
+        # Pro's rebuttal to Con's last argument
         pro_rebuttal_prompt = (
             f"Debate Topic: {debate_topic}\n"
             f"Debate Rules: {moderator.rule_set}\n"
             "When making your argument, please limit your response to no more than 6 sentences.\n"
+            "Tone: " + tone + "\n"
             "Role: Pro Debater\n"
             f'Your opponent previously argued: "{debater_b.argument_history[-1]}"\n'
             "Provide a concise rebuttal addressing the opponent's points."
         )
-        rebuttal_a = query_llm(pro_rebuttal_prompt)
-        debater_a.update_argument(rebuttal_a)
-        score_a = score_argument(rebuttal_a, debate_topic)
-        debater_a.update_score(score_a)
+        message_a_rebuttal = query_llm(pro_rebuttal_prompt)
+        score_a_rebuttal = score_argument(message_a_rebuttal, debate_topic)
+        debater_a.update_argument(message_a_rebuttal)
+        debater_a.update_score(score_a_rebuttal)
+        for segment in stream_message(message_a_rebuttal):
+            yield {
+                "round": round_num,
+                "debater": "Debater A",
+                "text": segment,
+                "timestamp": datetime.now().strftime("%H:%M:%S"),
+                "score": debater_a.score,
+            }
 
-        # Con's rebuttal addressing Pro's latest argument.
+        # Con's rebuttal to Pro's last argument
         con_rebuttal_prompt = (
             f"Debate Topic: {debate_topic}\n"
             f"Debate Rules: {moderator.rule_set}\n"
             "When making your argument, please limit your response to no more than 6 sentences.\n"
+            "Tone: " + tone + "\n"
             "Role: Con Debater\n"
             f'Your opponent previously argued: "{debater_a.argument_history[-1]}"\n'
             "Provide a concise rebuttal addressing the opponent's points."
         )
-        rebuttal_b = query_llm(con_rebuttal_prompt)
-        debater_b.update_argument(rebuttal_b)
-        score_b = score_argument(rebuttal_b, debate_topic)
-        debater_b.update_score(score_b)
-
-    return {
-        "debater_a": debater_a,
-        "debater_b": debater_b,
-        "moderator": moderator,
-    }
-
-
-if __name__ == "__main__":
-    # For testing purposes.
-    topic = "Artificial intelligence should be regulated."
-    states = simulate_multi_round_debate(topic, num_rounds=3)
-    print("Debater A State:", states["debater_a"].model_dump())
-    print("\nDebater B State:", states["debater_b"].model_dump())
-    print("\nModerator State:", states["moderator"].model_dump())
+        message_b_rebuttal = query_llm(con_rebuttal_prompt)
+        score_b_rebuttal = score_argument(message_b_rebuttal, debate_topic)
+        debater_b.update_argument(message_b_rebuttal)
+        debater_b.update_score(score_b_rebuttal)
+        for segment in stream_message(message_b_rebuttal):
+            yield {
+                "round": round_num,
+                "debater": "Debater B",
+                "text": segment,
+                "timestamp": datetime.now().strftime("%H:%M:%S"),
+                "score": debater_b.score,
+            }
