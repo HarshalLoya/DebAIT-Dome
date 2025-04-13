@@ -1,4 +1,5 @@
-# Multi-AI-Agent-Debate-System 🤖🗣️
+# DebAIT Dome 🤖🗣️  
+> <h3>A Multi AI Agent Debate System</h3>
 
 Welcome to the **Multi-AI-Agent-Debate-System**!  
 This project simulates a **real-time AI debate** where two intelligent agents engage in a multi-round debate, complete with live-streamed arguments, scoring, and an interactive UI.
