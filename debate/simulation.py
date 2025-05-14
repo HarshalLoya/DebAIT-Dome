@@ -25,7 +25,7 @@ def stream_multi_round_debate(
     prompt_a = (
         f"Debate Topic: {debate_topic}\n"
         f"Debate Rules: {moderator.rule_set}\n"
-        "When making your argument, please limit your response to no more than 6 sentences.\n"
+        f"When making your argument, please limit your response to no more than {max_sentences} sentences.\n"
         "Tone: " + tone + "\n"
         "Role: Pro Debater\n"
         "Generate a well-reasoned opening argument in favor of the topic."
@@ -47,7 +47,7 @@ def stream_multi_round_debate(
     prompt_b = (
         f"Debate Topic: {debate_topic}\n"
         f"Debate Rules: {moderator.rule_set}\n"
-        "When making your argument, please limit your response to no more than 6 sentences.\n"
+        f"When making your argument, please limit your response to no more than {max_sentences} sentences.\n"
         "Tone: " + tone + "\n"
         "Role: Con Debater\n"
         "Generate a well-reasoned opening argument against the topic."
@@ -73,7 +73,7 @@ def stream_multi_round_debate(
         pro_rebuttal_prompt = (
             f"Debate Topic: {debate_topic}\n"
             f"Debate Rules: {moderator.rule_set}\n"
-            "When making your argument, please limit your response to no more than 6 sentences.\n"
+            f"When making your argument, please limit your response to no more than {max_sentences} sentences.\n"
             "Tone: " + tone + "\n"
             "Role: Pro Debater\n"
             f'Your opponent previously argued: "{debater_b.argument_history[-1]}"\n'
@@ -96,7 +96,7 @@ def stream_multi_round_debate(
         con_rebuttal_prompt = (
             f"Debate Topic: {debate_topic}\n"
             f"Debate Rules: {moderator.rule_set}\n"
-            "When making your argument, please limit your response to no more than 6 sentences.\n"
+            f"When making your argument, please limit your response to no more than {max_sentences} sentences.\n"
             "Tone: " + tone + "\n"
             "Role: Con Debater\n"
             f'Your opponent previously argued: "{debater_a.argument_history[-1]}"\n'

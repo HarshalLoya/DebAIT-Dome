@@ -1,8 +1,10 @@
 import os
 import requests
+from dotenv import load_dotenv
 
 
 def query_llm(prompt: str) -> str:
+    load_dotenv()
     api_key = os.getenv("GROQ_LLAMA_70B_VERSATILE_API_KEY")
     if not api_key:
         raise ValueError(
